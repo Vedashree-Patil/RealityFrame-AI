@@ -1,10 +1,29 @@
 import cv2
+from modules.hand_tracker import HandTracker
+
 camera = cv2.VideoCapture(0)
+
+tracker = HandTracker()
+
 while True:
-    sucess, frame = camera.read()
-    if not sucess:
-        print("Couldn't Acess Camera")
+
+    success, frame = camera.read()
+
+    if not success:
         break
+
+    frame = tracker.detect_hands(frame)
+
+    cv2.putText(
+        frame,
+        "RealityFrame AI",
+        (20,40),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
+        (0,255,0),
+        2
+    )
+
     cv2.imshow("RealityFrame AI", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -12,4 +31,3 @@ while True:
 
 camera.release()
 cv2.destroyAllWindows()
-
