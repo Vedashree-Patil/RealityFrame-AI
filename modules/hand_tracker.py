@@ -17,6 +17,8 @@ class HandTracker:
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.hands.process(rgb)
 
+        landmarks_list = []
+
         if results.multi_hand_landmarks:
             for hand in results.multi_hand_landmarks:
                 self.drawer.draw_landmarks(
@@ -24,4 +26,15 @@ class HandTracker:
                     hand,
                     self.mpHands.HAND_CONNECTIONS
                 )
-        return frame
+
+                h, w, c = frame.shape
+
+                for id, lm in enumerate(hand.landmark):
+                    cx = int(lm.x* w)
+                    cy = int(lm.y* h)
+
+                    landmarks_list.append([id, cx, cy])
+
+                    cv2.putText(frame, str(id), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 1)
+
+        return frame, landmarks_list

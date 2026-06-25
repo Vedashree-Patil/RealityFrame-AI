@@ -22,4 +22,4 @@ An AI-powered computer vision assistant built with Python.
 
 - ✅ Day 1: Webcam integration
 - ✅ Day 2: Hand tracking
-- ⏳ Day 3: Gesture recognition
+- ✅ Day 3: Gesture recognition

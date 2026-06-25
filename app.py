@@ -12,7 +12,10 @@ while True:
     if not success:
         break
 
-    frame = tracker.detect_hands(frame)
+    frame, landmarks_list  = tracker.detect_hands(frame)
+
+    if landmarks_list:
+        print(landmarks_list[8])
 
     cv2.putText(
         frame,
