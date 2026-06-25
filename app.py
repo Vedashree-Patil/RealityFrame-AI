@@ -1,9 +1,10 @@
 import cv2
+
 from modules.hand_tracker import HandTracker
 
-camera = cv2.VideoCapture(0)
-
 tracker = HandTracker()
+
+camera = cv2.VideoCapture(0)
 
 while True:
 
@@ -12,20 +13,45 @@ while True:
     if not success:
         break
 
-    frame, landmarks_list  = tracker.detect_hands(frame)
+    frame = cv2.flip(frame, 1)
 
-    if landmarks_list:
-        print(landmarks_list[8])
+    frame, hands = tracker.detect_hands(frame)
 
-    cv2.putText(
-        frame,
-        "RealityFrame AI",
-        (20,40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0,255,0),
-        2
-    )
+    if hands:
+
+        for hand in hands:
+
+            fingers = tracker.count_fingers(hand)
+
+            total = fingers.count(1)
+
+            cv2.rectangle(
+                frame,
+                (20, 20),
+                (280, 110),
+                (40, 40, 40),
+                -1
+            )
+
+            cv2.putText(
+                frame,
+                f"Hand : {hand['type']}",
+                (35, 55),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (255,255,255),
+                2
+            )
+
+            cv2.putText(
+                frame,
+                f"Fingers : {total}",
+                (35, 90),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (255,255,255),
+                2
+            )
 
     cv2.imshow("RealityFrame AI", frame)
 
