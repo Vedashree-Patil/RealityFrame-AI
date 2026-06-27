@@ -1,11 +1,12 @@
 import cv2
 from modules.hand_tracker import HandTracker
+from modules.frame_manager import FrameManager
 
 # Initialize Hand Tracker
 tracker = HandTracker()
 
-# Variable to store captured Reality Frame
-reality_frame = None
+# Store all captured frames
+frame_manager = FrameManager()
 
 # Open Camera
 camera = cv2.VideoCapture(0)
@@ -19,18 +20,17 @@ while True:
 
     # Mirror the camera
     frame = cv2.flip(frame, 1)
+    clean_frame = frame.copy()
 
-    # Detect hands
+    # -------- Detect Hands --------
     frame, hands = tracker.detect_hands(frame)
 
-    # Count fingers
     if hands:
         for hand in hands:
 
             fingers = tracker.count_fingers(hand)
             total = fingers.count(1)
 
-            # Information Panel
             cv2.rectangle(
                 frame,
                 (20, 20),
@@ -59,7 +59,7 @@ while True:
                 2
             )
 
-    # Instructions
+    # -------- Instructions --------
     cv2.putText(
         frame,
         "Press C = Capture | Press Q = Quit",
@@ -70,50 +70,23 @@ while True:
         2
     )
 
-    # Keyboard Input
+    # -------- Keyboard --------
     key = cv2.waitKey(1) & 0xFF
 
-    # Capture Reality Frame
     if key == ord("c"):
-        reality_frame = frame.copy()
 
-    # Draw Reality Frame
-    if reality_frame is not None:
+        # Save a clean copy of the frame
+        frame_manager.capture(clean_frame)
 
-        # Resize
-        small = cv2.resize(reality_frame, (220, 150))
+        print(f"Reality Frame {len(frame_manager.get_frames())} Captured!")
 
-        h, w = frame.shape[:2]
+    # -------- Display all saved frames --------
+    frame_manager.display_gallery(frame)
 
-        x = w - 240
-        y = 20
-
-        frame[y:y+150, x:x+220] = small
-
-        # Border
-        cv2.rectangle(
-            frame,
-            (x - 2, y - 2),
-            (x + 222, y + 152),
-            (0, 255, 255),
-            2
-        )
-
-        # Title
-        cv2.putText(
-            frame,
-            "Reality Frame",
-            (x, y + 170),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            (255, 255, 255),
-            2
-        )
-
-    # Show Window
+    # -------- Show Window --------
     cv2.imshow("RealityFrame AI", frame)
 
-    # Quit
+    # -------- Quit --------
     if key == ord("q"):
         break
 
