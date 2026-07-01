@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}
+Gallery
+{% endblock %}
+
+{% block page_title %}
+Memory Gallery
+{% endblock %}
+
+{% block content %}
+
+<div class="gallery-page">
+
+    <!-- =========================== -->
+    <!-- Header -->
+    <!-- =========================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                <i class="fa-solid fa-images"></i>
+                Memory Gallery
+            </h2>
+
+            <p>
+                Browse all captured memories stored by RealityFrame AI.
+            </p>
+
+        </div>
+
+        <a href="/" class="capture-btn">
+
+            <i class="fa-solid fa-camera"></i>
+
+            Capture New Memory
+
+        </a>
+
+    </div>
+
+    <!-- =========================== -->
+    <!-- Gallery -->
+    <!-- =========================== -->
+
+    {% if memories %}
+
+    <div class="gallery-grid">
+
+        {% for memory in memories %}
+
+        <div class="gallery-card">
+
+            <!-- Image -->
+
+            <div class="gallery-image">
+
+                <img src="/frames/{{ memory.filename }}">
+
+                {% if memory.favorite %}
+
+                <div class="favorite-icon">
+
+                    ⭐
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- Information -->
+
+            <div class="gallery-info">
+
+                <h3>
+
+                    {{ memory.filename }}
+
+                </h3>
+
+                <p>
+
+                    <i class="fa-solid fa-calendar"></i>
+
+                    {{ memory.timestamp }}
+
+                </p>
+
+                <div class="description">
+
+                    {{ memory.description[:100] }}
+
+                    {% if memory.description|length > 100 %}
+
+                    ...
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Tags -->
+
+                <div class="tag-container">
+
+                    {% for tag in memory.tags[:4] %}
+
+                    <span class="tag">
+
+                        {{ tag }}
+
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+                <!-- Buttons -->
+
+                <div class="gallery-buttons">
+
+                    <a href="/memory/{{ loop.index0 }}"
+                       class="view-btn">
+
+                        <i class="fa-solid fa-eye"></i>
+
+                        View
+
+                    </a>
+
+                    <a href="/favorite/{{ loop.index0 }}"
+                       class="favorite-btn">
+
+                        {% if memory.favorite %}
+
+                        <i class="fa-solid fa-star"></i>
+
+                        {% else %}
+
+                        <i class="fa-regular fa-star"></i>
+
+                        {% endif %}
+
+                    </a>
+
+                    <a href="/delete/{{ loop.index0 }}"
+                       class="delete-btn"
+                       onclick="return confirm('Delete this memory?');">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <!-- Empty State -->
+
+    <div class="empty-box">
+
+        <i class="fa-solid fa-folder-open"></i>
+
+        <h2>
+
+            No Memories Yet
+
+        </h2>
+
+        <p>
+
+            Start capturing your surroundings with RealityFrame AI.
+
+        </p>
+
+        <a href="/"
+           class="capture-btn">
+
+            Capture First Memory
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

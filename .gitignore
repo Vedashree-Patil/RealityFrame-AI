@@ -1,7 +1,28 @@
-venv/
+# Python
+
 __pycache__/
 *.pyc
+
+# Virtual Environment
+
+venv/
 .env
+
+# VS Code
+
 .vscode/
+
+# Python cache
+
+*.pyo
+*.pyd
+
+# Images & Memory
+
 frames/
 memories/
+
+# OS
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search
+{% endblock %}
+
+{% block page_title %}
+Search Memories
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+<h2>🔍 Search Memories</h2>
+
+<p>Search using filename, description or tags.</p>
+
+</div>
+
+<div class="search-box">
+
+<form method="GET">
+
+<input
+
+type="text"
+
+name="query"
+
+placeholder="Search memories...">
+
+<button>
+
+Search
+
+</button>
+
+</form>
+
+</div>
+
+<div class="gallery-grid">
+
+{% if memories %}
+
+{% for memory in memories %}
+
+<div class="memory-card">
+
+<img src="{{ url_for('frame', filename=memory.filename) }}">
+
+<div class="memory-info">
+
+<h3>{{ memory.filename }}</h3>
+
+<p>{{ memory.timestamp }}</p>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="empty-box">
+
+<h2>No Results</h2>
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        RealityFrame AI
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/main.css') }}">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-brain"></i>
+
+            <div>
+
+                <h2>RealityFrame AI</h2>
+
+                <p>Visual Memory Assistant</p>
+
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="/"
+               class="{% if request.path=='/' %}active{% endif %}">
+
+                <i class="fa-solid fa-house"></i>
+
+                Dashboard
+
+            </a>
+
+            <a href="/gallery"
+               class="{% if request.path=='/gallery' %}active{% endif %}">
+
+                <i class="fa-solid fa-images"></i>
+
+                Gallery
+
+            </a>
+
+            <a href="/favorites"
+               class="{% if request.path=='/favorites' %}active{% endif %}">
+
+                <i class="fa-solid fa-star"></i>
+
+                Favorites
+
+            </a>
+
+            <a href="/search"
+               class="{% if request.path=='/search' %}active{% endif %}">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                Search
+
+            </a>
+
+            <a href="/settings"
+               class="{% if request.path=='/settings' %}active{% endif %}">
+
+                <i class="fa-solid fa-gear"></i>
+
+                Settings
+
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <p>
+
+                🚀 RealityFrame AI v2
+
+            </p>
+
+        </div>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+        <!-- Navbar -->
+
+        <header class="navbar">
+
+            <div>
+
+                <h1>
+
+                    {% block page_title %}
+
+                    Dashboard
+
+                    {% endblock %}
+
+                </h1>
+
+            </div>
+
+            <div class="navbar-right">
+
+                <input
+
+                    type="text"
+
+                    placeholder="Search memories..."
+
+                    class="search-input"
+
+                >
+
+                <div class="profile">
+
+                    <div class="avatar">
+
+                        V
+
+                    </div>
+
+                    <div>
+
+                        <h4>Vedashree</h4>
+
+                        <p>AI Engineer</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- Page Content -->
+
+        <section class="page-content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

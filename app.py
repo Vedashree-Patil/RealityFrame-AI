@@ -1,94 +1,216 @@
 import cv2
-from modules.hand_tracker import HandTracker
+
+from flask import (
+    Flask,
+    render_template,
+    Response,
+    redirect,
+    url_for,
+    send_from_directory,
+    request
+)
+
+from modules.camera_stream import generate_frames
 from modules.frame_manager import FrameManager
 
-# Initialize Hand Tracker
-tracker = HandTracker()
+app = Flask(__name__)
 
-# Store all captured frames
+# -------------------------------
+# Initialize Frame Manager & Camera
+# -------------------------------
+
 frame_manager = FrameManager()
-
-# Open Camera
 camera = cv2.VideoCapture(0)
 
-while True:
+
+# -------------------------------
+# Dashboard
+# -------------------------------
+
+@app.route("/")
+def dashboard():
+
+    memories = frame_manager.get_frames()
+
+    return render_template(
+        "dashboard.html",
+        memories=memories
+    )
+
+
+# -------------------------------
+# Live Camera Feed
+# -------------------------------
+
+@app.route("/video")
+def video():
+
+    return Response(
+        generate_frames(),
+        mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
+
+
+# -------------------------------
+# Capture Memory
+# -------------------------------
+
+@app.route("/capture", methods=["POST"])
+def capture():
 
     success, frame = camera.read()
 
-    if not success:
-        break
+    if success:
 
-    # Mirror the camera
-    frame = cv2.flip(frame, 1)
-    clean_frame = frame.copy()
+        frame = cv2.flip(frame, 1)
 
-    # -------- Detect Hands --------
-    frame, hands = tracker.detect_hands(frame)
+        frame_manager.capture(frame)
 
-    if hands:
-        for hand in hands:
+    return redirect(url_for("dashboard"))
 
-            fingers = tracker.count_fingers(hand)
-            total = fingers.count(1)
 
-            cv2.rectangle(
-                frame,
-                (20, 20),
-                (280, 110),
-                (40, 40, 40),
-                -1
-            )
+# -------------------------------
+# Gallery
+# -------------------------------
 
-            cv2.putText(
-                frame,
-                f"Hand : {hand['type']}",
-                (35, 55),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.8,
-                (255, 255, 255),
-                2
-            )
+@app.route("/gallery")
+def gallery():
 
-            cv2.putText(
-                frame,
-                f"Fingers : {total}",
-                (35, 90),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.8,
-                (255, 255, 255),
-                2
-            )
-
-    # -------- Instructions --------
-    cv2.putText(
-        frame,
-        "Press C = Capture | Press Q = Quit",
-        (20, 460),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (0, 255, 255),
-        2
+    return render_template(
+        "gallery.html",
+        memories=frame_manager.get_frames()
     )
 
-    # -------- Keyboard --------
-    key = cv2.waitKey(1) & 0xFF
 
-    if key == ord("c"):
+# -------------------------------
+# Favorites
+# -------------------------------
 
-        # Save a clean copy of the frame
-        frame_manager.capture(clean_frame)
+@app.route("/favorites")
+def favorites():
 
-        print(f"Reality Frame {len(frame_manager.get_frames())} Captured!")
+    return render_template(
+        "favorites.html",
+        memories=frame_manager.get_frames()
+    )
 
-    # -------- Display all saved frames --------
-    frame_manager.display_gallery(frame)
 
-    # -------- Show Window --------
-    cv2.imshow("RealityFrame AI", frame)
+# -------------------------------
+# Search
+# -------------------------------
 
-    # -------- Quit --------
-    if key == ord("q"):
-        break
+@app.route("/search")
+def search():
 
-camera.release()
-cv2.destroyAllWindows()
+    query = request.args.get("query", "").lower()
+
+    memories = frame_manager.get_frames()
+
+    if query == "":
+
+        filtered = memories
+
+    else:
+
+        filtered = []
+
+        for memory in memories:
+
+            filename = memory.get("filename", "").lower()
+            description = memory.get("description", "").lower()
+
+            tags = " ".join(memory.get("tags", [])).lower()
+
+            objects = " ".join(memory.get("objects", [])).lower()
+
+            if (
+                query in filename
+                or query in description
+                or query in tags
+                or query in objects
+            ):
+                filtered.append(memory)
+
+    return render_template(
+        "search.html",
+        memories=filtered
+    )
+
+
+# -------------------------------
+# Individual Memory Page
+# -------------------------------
+
+@app.route("/memory/<int:index>")
+def memory(index):
+
+    memories = frame_manager.get_frames()
+
+    if index < 0 or index >= len(memories):
+
+        return "Memory Not Found"
+
+    return render_template(
+        "memory.html",
+        memory=memories[index]
+    )
+
+
+# -------------------------------
+# Serve Saved Images
+# -------------------------------
+
+@app.route("/frames/<filename>")
+def frame(filename):
+
+    return send_from_directory(
+        "frames",
+        filename
+    )
+
+
+# -------------------------------
+# Toggle Favourite
+# -------------------------------
+
+@app.route("/favorite/<int:index>")
+def favorite(index):
+
+    frame_manager.toggle_favourite(index)
+
+    return redirect(request.referrer or url_for("gallery"))
+
+
+# -------------------------------
+# Delete Memory
+# -------------------------------
+
+@app.route("/delete/<int:index>")
+def delete(index):
+
+    frame_manager.delete_memory(index)
+
+    return redirect(url_for("gallery"))
+
+
+# -------------------------------
+# Settings
+# -------------------------------
+
+@app.route("/settings")
+def settings():
+
+    return render_template("settings.html")
+
+
+# -------------------------------
+# Run Application
+# -------------------------------
+
+if __name__ == "__main__":
+
+    app.run(
+        debug=True,
+        host="0.0.0.0",
+        port=5000
+    )

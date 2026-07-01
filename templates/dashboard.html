@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <!-- ========================= -->
+    <!-- Statistics Cards -->
+    <!-- ========================= -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-images"></i>
+            </div>
+
+            <div>
+
+                <h2>{{ memories|length }}</h2>
+
+                <p>Total Memories</p>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon yellow">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+
+                <h2>
+
+                    {{ memories|selectattr("favorite")|list|length }}
+
+                </h2>
+
+                <p>Favorites</p>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+
+            <div>
+
+                <h2>{{ memories|length }}</h2>
+
+                <p>AI Analysed</p>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+
+            <div>
+
+                <h2>Live</h2>
+
+                <p>Camera Status</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- Camera + AI -->
+    <!-- ========================= -->
+
+    <div class="main-grid">
+
+        <!-- Camera -->
+
+        <div class="camera-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Live Camera
+
+                </h2>
+
+            </div>
+
+            <div class="camera-frame">
+
+                <img src="{{ url_for('video') }}">
+
+            </div>
+
+            <form action="/capture" method="POST">
+
+                <button class="capture-btn">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Capture Memory
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- AI Panel -->
+
+        <div class="ai-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-brain"></i>
+
+                    AI Memory Analysis
+
+                </h2>
+
+            </div>
+
+            {% if memories %}
+
+            <div class="analysis-box">
+
+                <h3>
+
+                    Latest Memory
+
+                </h3>
+
+                <p>
+
+                    {{ memories[0].description }}
+
+                </p>
+
+                <hr>
+
+                <h4>Detected Objects</h4>
+
+                <div class="tag-container">
+
+                    {% for obj in memories[0].objects %}
+
+                    <span class="tag">
+
+                        {{ obj }}
+
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+                <hr>
+
+                <h4>Tags</h4>
+
+                <div class="tag-container">
+
+                    {% for tag in memories[0].tags %}
+
+                    <span class="tag blue">
+
+                        {{ tag }}
+
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-box">
+
+                <i class="fa-solid fa-robot"></i>
+
+                <p>
+
+                    Capture a memory to let Gemini AI
+                    analyse your surroundings.
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- Recent Memories -->
+    <!-- ========================= -->
+
+    <div class="recent-section">
+
+        <div class="section-header">
+
+            <h2>
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                Recent Memories
+
+            </h2>
+
+            <a href="/gallery">
+
+                View All →
+
+            </a>
+
+        </div>
+
+        <div class="memory-grid">
+
+            {% if memories %}
+
+            {% for memory in memories[:8] %}
+
+            <div class="memory-card">
+
+                <img src="/frames/{{ memory.filename }}">
+
+                <div class="memory-info">
+
+                    <h3>
+
+                        {{ memory.filename }}
+
+                    </h3>
+
+                    <p>
+
+                        {{ memory.timestamp }}
+
+                    </p>
+
+                    {% if memory.favorite %}
+
+                    <span class="favorite-badge">
+
+                        ⭐ Favorite
+
+                    </span>
+
+                    {% endif %}
+
+                    <div class="memory-buttons">
+
+                        <a href="/memory/{{ loop.index0 }}">
+
+                            View
+
+                        </a>
+
+                        <a href="/favorite/{{ loop.index0 }}">
+
+                            ⭐
+
+                        </a>
+
+                        <a href="/delete/{{ loop.index0 }}">
+
+                            🗑
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <div class="empty-box">
+
+                <i class="fa-solid fa-folder-open"></i>
+
+                <h2>
+
+                    No Memories Yet
+
+                </h2>
+
+                <p>
+
+                    Press Capture Memory to create
+                    your first AI memory.
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

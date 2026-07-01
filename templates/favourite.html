@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+Favorites
+{% endblock %}
+
+{% block page_title %}
+Favorite Memories
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>⭐ Favorites</h2>
+
+    <p>Your favourite memories appear here.</p>
+
+</div>
+
+<div class="gallery-grid">
+
+{% set found = false %}
+
+{% for memory in memories %}
+
+    {% if memory.favourite %}
+
+    {% set found = true %}
+
+    <div class="memory-card">
+
+        <img src="{{ url_for('frame', filename=memory.filename) }}">
+
+        <div class="memory-info">
+
+            <h3>{{ memory.filename }}</h3>
+
+            <p>{{ memory.timestamp }}</p>
+
+            <span class="favorite">⭐ Favorite</span>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+{% endfor %}
+
+{% if not found %}
+
+<div class="empty-box">
+
+    <h2>No Favorites Yet</h2>
+
+    <p>Mark memories as favourite to see them here.</p>
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}
